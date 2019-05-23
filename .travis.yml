@@ -1,0 +1,27 @@
+sudo: required
+services:
+  - docker
+
+# development/test build block
+before_install:
+  # for now only client service test implemented, so build the client
+  - docker build -t lavalife/react-test -f ./client/dev.Dockerfile ./client
+
+# script block is used mostly for tests
+script:
+  # test the above built image by changin default CMD
+  - docker run lavalife/react-test npm run test
+
+# production build/push block
+after_success:
+  - docker build -t lavalife/multi-client ./client
+  - docker build -t lavalife/multi-nginx ./nginx
+  - docker build -t lavalife/multi-server ./server
+  - docker build -t lavalife/multi-worker ./worker
+  # Log in to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take those images and push them to docker hub
+  - docker push lavalife/multi-client
+  - docker push lavalife/multi-nginx
+  - docker push lavalife/multi-server
+  - docker push lavalife/multi-worker
