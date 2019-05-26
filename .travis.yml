@@ -25,3 +25,18 @@ after_success:
   - docker push lavalife/multi-nginx
   - docker push lavalife/multi-server
   - docker push lavalife/multi-worker
+
+
+# actual deploy to AWS
+deploy:
+  provider: elasticbeanstalk
+  region: us-east-2
+  app: multi-docker
+  env: MultiDocker-env
+  bucket-name: elasticbeanstalk-us-east-2-638918793553
+  bucket-path: multi-docker
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key:
+    secure: $AWS_SECRET_KEY
